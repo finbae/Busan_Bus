@@ -22,10 +22,15 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release"){
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
         }
+//        release {
+//            isMinifyEnabled = false
+//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+//        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -38,6 +43,18 @@ android {
             }
         }
     }
+
+//    afterEvaluate {
+//        publishing {
+  //          publications {
+    //            create<MavenPublication>("maven") {
+      //              from(components["release"])
+        //            groupId = "com.github.mint"
+          //          artifactId = "mint-android-app"
+            //        version = "0.0.1"
+              //  }
+           // }
+        //}}
 
 
 
@@ -63,7 +80,6 @@ dependencies {
     implementation ("com.github.skydoves:powerspinner:1.2.6")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.github.User:Repo:Version")
     implementation("com.github.smart-fun:XmlToJson:1.5.3")
     implementation("com.android.volley:volley:1.2.1")
