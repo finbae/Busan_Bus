@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    `maven-publish`
+   "maven-publish"
 }
 
 android {
