@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-   "maven-publish"
+    id("maven-publish")
 }
 
 android {
@@ -38,6 +38,10 @@ android {
             }
         }
     }
+
+
+
+
 }
 
 dependencies {
@@ -60,7 +64,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.google.code.gson:gson:2.8.9")
-    implementation("com.github.User:Repo:Tag")
+    implementation("com.github.User:Repo:Version")
     implementation("com.github.smart-fun:XmlToJson:1.5.3")
     implementation("com.android.volley:volley:1.2.1")
 }
