@@ -1,5 +1,6 @@
 package com.cookandroid.myproject;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -7,12 +8,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.Manifest;
-import android.widget.Button;
-import android.widget.Toast;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -25,32 +26,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.naver.maps.map.LocationTrackingMode;
-import com.naver.maps.map.NaverMapSdk;
 import com.naver.maps.map.NaverMap;
+import com.naver.maps.map.NaverMapSdk;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.util.FusedLocationSource;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import android.os.AsyncTask;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 import fr.arnaudguyon.xmltojsonlib.XmlToJson;
 
-
-public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationSource locationSource;
     private NaverMap naverMap;
@@ -63,9 +54,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     public Button send;
     TextView status1;
 
-
     String key = "hWgYHZ6wSKK1RN4xdueRnFz%2FVA405Tx%2BS0EvdwNZlyUviUzbvd5Ram9Z33045GZzCmFZd0uLqwKuMizAdKE2hQ%3D%3D";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +78,11 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                 Log.i("MY LOCATION", "위도 : " + location.getLatitude());
                 Log.i("MY LOCATION", "경도 : " + location.getLongitude());
 
+                checkProximityAndLog(location);
             }
         };
 
         checkLocationPermission();
-
     }
 
     private void initView() {
@@ -113,7 +102,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         });
     }
 
-    private void BusArriveTask(String search){
+    private void BusArriveTask(String search) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
 
         String bstopid = null;
@@ -123,8 +112,8 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             e.printStackTrace();
         }
 
-        String url = "http://apis.data.go.kr/6260000/BusanBIMS/stopArrByBstopid?serviceKey="+key+"&bstopid="+bstopid+"";
-        Log.d(TAG, "URL:"+url);
+        String url = "http://apis.data.go.kr/6260000/BusanBIMS/stopArrByBstopid?serviceKey=" + key + "&bstopid=" + bstopid;
+        Log.d(TAG, "URL:" + url);
 
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -141,10 +130,10 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         requestQueue.add(request);
     }
 
-    private void XMLtoJSONData(String xml){
+    private void XMLtoJSONData(String xml) {
         XmlToJson xmlToJson = new XmlToJson.Builder(xml).build();
         JSONObject jsonObject = xmlToJson.toJson();
-        Log.d(TAG, "jsonObject:"+jsonObject);
+        Log.d(TAG, "jsonObject:" + jsonObject);
 
         try {
             JSONObject response = jsonObject.getJSONObject("response");
@@ -152,15 +141,15 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             String resultCode = msgHeader.optString("resultCode");
             Log.d(TAG, "String resultCode :" + resultCode);
 
-            if (resultCode.equals("0")){
+            if (resultCode.equals("0")) {
                 JSONObject msgBody = response.getJSONObject("msgBody");
-                Log.d(TAG, "jsonObject mshBody :"+msgBody);
+                Log.d(TAG, "jsonObject msgBody :" + msgBody);
 
                 JSONArray array = msgBody.getJSONArray("busArrivalList");
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = array.getJSONObject(i);
-                    String 	lineno = obj.optString("lineNo"); // 버스 번호
-                    String 	gpsx = obj.optString("gpsx"); // x좌표
+                    String lineno = obj.optString("lineNo"); // 버스 번호
+                    String gpsx = obj.optString("gpsx"); // x좌표
                     String gpsy = obj.optString("gpsy"); // y좌표
                     String min1 = obj.optString("min1"); // 남은 도착시간
 
@@ -168,19 +157,34 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                     Log.d(TAG, "X coordinate (gpsx): " + gpsx);
                     Log.d(TAG, "Y coordinate (gpsy): " + gpsy);
                     Log.d(TAG, "Remaining arrival time (min1): " + min1);
+
+                    // Save the coordinates for proximity checking
+                    BusStop busStop = new BusStop(lineno, Double.parseDouble(gpsx), Double.parseDouble(gpsy), min1);
+                    busStops.add(busStop);
                 }
-            } else if (resultCode.equals("1")) {
-                Toast.makeText(context, "시스템 에러가 발생하였습니다", Toast.LENGTH_SHORT).show();
-            } else if (resultCode.equals("4")) {
-                Toast.makeText(context, "결과가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
-            } else if (resultCode.equals("8")) {
-                Toast.makeText(context, "요청 제한을 초과하였습니다", Toast.LENGTH_SHORT).show();
-            } else if (resultCode.equals("23")) {
-                Toast.makeText(context, "버스 도착 정보가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
+            } else {
+                handleResultCode(resultCode);
             }
 
-        } catch (JSONException e){
+        } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void handleResultCode(String resultCode) {
+        switch (resultCode) {
+            case "1":
+                Toast.makeText(context, "시스템 에러가 발생하였습니다", Toast.LENGTH_SHORT).show();
+                break;
+            case "4":
+                Toast.makeText(context, "결과가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
+                break;
+            case "8":
+                Toast.makeText(context, "요청 제한을 초과하였습니다", Toast.LENGTH_SHORT).show();
+                break;
+            case "23":
+                Toast.makeText(context, "버스 도착 정보가 존재하지 않습니다", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 
@@ -242,5 +246,31 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
-}
 
+    // 새로운 클래스 추가: BusStop
+    private class BusStop {
+        String lineNo;
+        double gpsX;
+        double gpsY;
+        String min1;
+
+        BusStop(String lineNo, double gpsX, double gpsY, String min1) {
+            this.lineNo = lineNo;
+            this.gpsX = gpsX;
+            this.gpsY = gpsY;
+            this.min1 = min1;
+        }
+    }
+
+    private ArrayList<BusStop> busStops = new ArrayList<>();
+
+    private void checkProximityAndLog(Location location) {
+        for (BusStop busStop : busStops) {
+            float[] results = new float[1];
+            Location.distanceBetween(location.getLatitude(), location.getLongitude(), busStop.gpsY, busStop.gpsX, results);
+            if (results[0] < 100) { // 100 meters proximity check
+                Log.i("PROXIMITY ALERT", "Bus number: " + busStop.lineNo + ", Remaining time: " + busStop.min1);
+            }
+        }
+    }
+}
