@@ -56,7 +56,7 @@ public class BusInfoDownloader extends AppCompatActivity {
             try {
                 double latitude = params[0];
                 double longitude = params[1];
-                String apiUrl = "http://apis.data.go.kr/6260000/BusanBIMS/busStopList?bstopnm=부산시청&arsno=13708&pageNo=1&numOfRows=10&serviceKey=hWgYHZ6wSKK1RN4xdueRnFz%2FVA405Tx%2BS0EvdwNZlyUviUzbvd5Ram9Z33045GZzCmFZd0uLqwKuMizAdKE2hQ%3D%3D"; // 실제 API URL로 대체
+                String apiUrl = "http://apis.data.go.kr/6260000/BusanBIMS/stopArrByBstopid?bstopid=505780000&serviceKey=hWgYHZ6wSKK1RN4xdueRnFz%2FVA405Tx%2BS0EvdwNZlyUviUzbvd5Ram9Z33045GZzCmFZd0uLqwKuMizAdKE2hQ%3D%3D"; // 실제 API URL로 대체
                 URL url = new URL(apiUrl);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {

@@ -36,6 +36,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     sourceSets {
         getByName("main") {
             assets {
@@ -67,4 +68,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.github.smart-fun:XmlToJson:1.5.3")
     implementation("com.android.volley:volley:1.2.1")
+    implementation("io.github.ParkSangGwon:tedclustering-naver:1.0.2")
 }

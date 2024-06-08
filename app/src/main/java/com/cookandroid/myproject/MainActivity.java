@@ -1,7 +1,13 @@
 package com.cookandroid.myproject;
 
+import android.app.ActivityManager;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,11 +31,22 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.naver.maps.geometry.LatLng;
+import com.naver.maps.geometry.LatLngBounds;
+import com.naver.maps.map.CameraPosition;
+import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.LocationTrackingMode;
+import com.naver.maps.map.MapFragment;
+import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMapSdk;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
+import com.naver.maps.map.overlay.LocationOverlay;
+import com.naver.maps.map.overlay.Marker;
+import com.naver.maps.map.overlay.Overlay;
+import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.util.FusedLocationSource;
+import com.naver.maps.map.util.MarkerIcons;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,11 +64,15 @@ import android.os.AsyncTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import fr.arnaudguyon.xmltojsonlib.XmlToJson;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 
 public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback {
+    private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationSource locationSource;
     private NaverMap naverMap;
@@ -62,6 +84,26 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     public EditText edit;
     public Button send;
     TextView status1;
+
+    SQLiteDatabase db;
+    TextView textView;
+
+    private double lat, lon;
+
+    private NaverMapItem naverMapList;
+    private List<NaverMapData> naverMapInfo;
+
+    private final double markerLatitude = 35.188833519106;
+    private final double markerLongitude = 129.084941554332;
+
+
+
+
+    private static final int PERMISSION_REQUEST_CODE = 100;
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
 
     String key = "hWgYHZ6wSKK1RN4xdueRnFz%2FVA405Tx%2BS0EvdwNZlyUviUzbvd5Ram9Z33045GZzCmFZd0uLqwKuMizAdKE2hQ%3D%3D";
@@ -75,24 +117,58 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         initView();
 
+        textView = findViewById(R.id.mainTextView);
+
+
         NaverMapSdk.getInstance(this).setClient(
                 new NaverMapSdk.NaverCloudPlatformClient("3e8n3zzsba"));
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentById(R.id.map);
+        if(mapFragment == null){
+            mapFragment = MapFragment.newInstance();
+            fragmentManager.beginTransaction().add(R.id.map, mapFragment).commit();
+        }
+
+        //getMapAsync 호출해 비동기로 onMapReady 콜백 메서드 호출
+        //onMapReady에서 NaverMap 객체를 받음.
+        mapFragment.getMapAsync(this);
 
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+
+
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
+                Location myLocation = location;
                 // 위치가 변할 때마다 실행
-                Log.i("MY LOCATION", "위도 : " + location.getLatitude());
-                Log.i("MY LOCATION", "경도 : " + location.getLongitude());
+                Log.i("MY LOCATION", location.getLatitude() + ", " + location.getLongitude());
+
 
             }
         };
 
         checkLocationPermission();
+
+    }
+
+    private  void dbInsert() {
+        ContentValues dbvalue = new ContentValues();
+        dbvalue.put("arsno", "13058");
+        dbvalue.put("bstopid", "193310301");
+        dbvalue.put("lineno", "110-1");
+        dbvalue.put("nodenm", "웰니스병원.연산농협");
+        dbvalue.put("gpsx", "129.084941554332");
+        dbvalue.put("gpsy", "35.188833519106");
+        dbvalue.put("arsno", "13058");
+        dbvalue.put("bstopid", "193310301");
+        dbvalue.put("lineno", "87");
+        dbvalue.put("nodenm", "웰니스병원.연산농협");
+        dbvalue.put("gpsx", "129.084941554332");
+        dbvalue.put("gpsy", "35.188833519106");
 
     }
 
@@ -196,7 +272,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             // 권한이 허용되었을 때, 위치 업데이트 요청
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    3000,
+                    1000,
                     -1,
                     locationListener);
         }
@@ -204,7 +280,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 100) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // 권한이 허용되었을 때, 위치 업데이트 요청
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -225,21 +301,107 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+
     @Override
     public void onMapReady(@NonNull NaverMap naverMap) {
         this.naverMap = naverMap;
         naverMap.setLocationSource(locationSource);
+        naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
 
-        // 위치 권한이 허용된 경우에만 LocationTrackingMode.Follow 설정
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
+        Marker marker1 = new Marker();
+        marker1.setPosition(new LatLng(markerLatitude, markerLongitude));
+        marker1.setWidth(90);
+        marker1.setHeight(90);
+        marker1.setMap(naverMap);
 
-            naverMap.addOnLocationChangeListener(location ->
-                    Toast.makeText(this,
-                            location.getLatitude() + ", " + location.getLongitude(),
-                            Toast.LENGTH_SHORT).show());
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        }
+        ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_REQUEST_CODE);
+
+        LocationOverlay locationOverlay = naverMap.getLocationOverlay();
+        locationOverlay.setVisible(true);
+
+        naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
+            @Override
+            public void onLocationChange(@NonNull Location location) {
+                lat = location.getLatitude();
+                lon = location.getLongitude();
+                locationOverlay.setPosition(new LatLng(lat, lon));
+
+                // 두 위치 사이 거리 계산
+                double distance = DistanceByDegreeAndroid(lat, lon, markerLatitude, markerLongitude);
+
+                // 특정 거리 이내(예: 50미터)에 있을 경우 True 출력
+                if (distance < 50) {
+                    Log.d(TAG, "True");
+                    Toast.makeText(MainActivity.this, "True", Toast.LENGTH_SHORT).show();
+                }
+
+                // 거리 오차 출력
+                Log.d(TAG, "Distance to marker: " + distance + " meters");
+                Toast.makeText(MainActivity.this, "Distance to marker: " + distance + " meters", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //        NaverMapApilnterface naverMapApilnterface = NaverMapRequest.getClient().create(NaverMapApilnterface.class);
+//        Call<NaverMapItem> call = naverMapApilnterface.getMapData();
+//
+//        call.enqueue(new Callback<NaverMapItem>() {
+//            @Override
+//            public void onResponse(Call<NaverMapItem> call, retrofit2.Response<NaverMapItem> response) {
+//                naverMapList = response.body();
+//                naverMapInfo = naverMapList.Bus;
+//                Log.d("main",naverMapList.toString());
+//
+//                for (int i=0; i < naverMapInfo.size(); i++){
+//                    Marker[] markers = new Marker[naverMapInfo.size()];
+//
+//                    markers[i] = new Marker();
+//                    Mlat = naverMapInfo.get(i).getgpsx();
+//                    Mlon = naverMapInfo.get(i).getgpsy();
+//                    markers[i].setPosition(new LatLng(Mlat, Mlon));
+//                    markers[i].setMap(naverMap);
+//
+//                    int finalI = i;
+//                    markers[i].setOnClickListener(new Overlay.OnClickListener() {
+//                        @Override
+//                        public boolean onClick(@NonNull Overlay overlay)
+//                        {
+//                            Toast.makeText(getApplication(), "마커" + finalI + "클릭", Toast.LENGTH_SHORT).show();
+//                            return false;
+//                        }
+//                    });
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<NaverMapItem> call, Throwable t) {
+//                Log.d("main",naverMapList.toString());
+//            }
+//        });
+
+        //         위치 권한이 허용된 경우에만 LocationTrackingMode.Follow 설정
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
+//
+//            naverMap.addOnLocationChangeListener(location ->
+//                    Toast.makeText(this,
+//                            location.getLatitude() + ", " + location.getLongitude(),
+//                            Toast.LENGTH_SHORT).show());
+//        } else {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+//        }
+
     }
+
+    public double DistanceByDegreeAndroid(double _latitude1, double _longitude1, double _latitude2, double _longitude2) {
+        Location startPos = new Location("PointA");
+        Location endPos = new Location("PointB");
+
+        startPos.setLatitude(_latitude1);
+        startPos.setLongitude(_longitude1);
+        endPos.setLatitude(_latitude2);
+        endPos.setLongitude(_longitude2);
+
+        return startPos.distanceTo(endPos);
+    }
+
 }
