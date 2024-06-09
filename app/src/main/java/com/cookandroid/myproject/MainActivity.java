@@ -12,6 +12,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.Manifest;
 import android.widget.Button;
@@ -69,6 +71,9 @@ import java.util.List;
 import fr.arnaudguyon.xmltojsonlib.XmlToJson;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.POST;
 
 
 public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback {
@@ -85,18 +90,15 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     public Button send;
     TextView status1;
 
-    SQLiteDatabase db;
     TextView textView;
 
     private double lat, lon;
 
-    private NaverMapItem naverMapList;
-    private List<NaverMapData> naverMapInfo;
 
     private final double markerLatitude = 35.188833519106;
     private final double markerLongitude = 129.084941554332;
 
-
+    Call<data_model> call;
 
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+
 
 
     String key = "hWgYHZ6wSKK1RN4xdueRnFz%2FVA405Tx%2BS0EvdwNZlyUviUzbvd5Ram9Z33045GZzCmFZd0uLqwKuMizAdKE2hQ%3D%3D";
@@ -117,7 +120,38 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         initView();
 
-        textView = findViewById(R.id.mainTextView);
+//        textView = findViewById(R.id.mainTextView);
+
+        DBHelper helper;
+        SQLiteDatabase db;
+        helper = new DBHelper(MainActivity.this, "newdb.db", null, 1);
+        db = helper.getWritableDatabase();
+        helper.onCreate(db);
+        ContentValues values = new ContentValues();
+        values.put("txt","HelloLlama");
+        db.insert("mytable",null,values);
+
+        call = retrofit_client.getApiService().test_api_get();
+        call.enqueue(new Callback<data_model>() {
+            @Override
+            public void onResponse(Call<data_model> call, retrofit2.Response<data_model> response) {
+                data_model result = response.body();
+                String str;
+                str= result.getid() +"\n"+
+                        result.getArsno()+"\n"+
+                        result.getBstopid()+"\n"+
+                        result.getLineno()+"\n"+
+                        result.getNodenm()+"\n"+
+                        result.getGpsx()+"\n"+
+                        result.getGpsy();
+                textView.setText(str);
+            }
+
+            @Override
+            public void onFailure(Call<data_model> call, Throwable t) {
+
+            }
+        });
 
 
         NaverMapSdk.getInstance(this).setClient(
@@ -155,38 +189,21 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     }
 
-    private  void dbInsert() {
-        ContentValues dbvalue = new ContentValues();
-        dbvalue.put("arsno", "13058");
-        dbvalue.put("bstopid", "193310301");
-        dbvalue.put("lineno", "110-1");
-        dbvalue.put("nodenm", "웰니스병원.연산농협");
-        dbvalue.put("gpsx", "129.084941554332");
-        dbvalue.put("gpsy", "35.188833519106");
-        dbvalue.put("arsno", "13058");
-        dbvalue.put("bstopid", "193310301");
-        dbvalue.put("lineno", "87");
-        dbvalue.put("nodenm", "웰니스병원.연산농협");
-        dbvalue.put("gpsx", "129.084941554332");
-        dbvalue.put("gpsy", "35.188833519106");
-
-    }
-
     private void initView() {
-        status1 = (TextView) findViewById(R.id.result);
-        edit = (EditText) findViewById(R.id.message);
-        send = (Button) findViewById(R.id.send);
+//        status1 = (TextView) findViewById(R.id.result);
+//        edit = (EditText) findViewById(R.id.message);
+//        send = (Button) findViewById(R.id.send);
 
         //messsage send action
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!edit.getText().toString().isEmpty()){
-                    BusArriveTask(edit.getText().toString());
-                    edit.setText(" ");
-                }
-            }
-        });
+//        send.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!edit.getText().toString().isEmpty()){
+//                    BusArriveTask(edit.getText().toString());
+//                    edit.setText(" ");
+//                }
+//            }
+//        });
     }
 
     private void BusArriveTask(String search){
@@ -332,16 +349,32 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                 // 특정 거리 이내(예: 50미터)에 있을 경우 True 출력
                 if (distance < 50) {
                     Log.d(TAG, "True");
-                    Toast.makeText(MainActivity.this, "True", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, activity_sub.class));
+//                    Toast.makeText(MainActivity.this, "True", Toast.LENGTH_SHORT).show();
                 }
 
                 // 거리 오차 출력
                 Log.d(TAG, "Distance to marker: " + distance + " meters");
-                Toast.makeText(MainActivity.this, "Distance to marker: " + distance + " meters", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Distance to marker: " + distance + " meters", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        //        NaverMapApilnterface naverMapApilnterface = NaverMapRequest.getClient().create(NaverMapApilnterface.class);
+    public double DistanceByDegreeAndroid(double _latitude1, double _longitude1, double _latitude2, double _longitude2) {
+        Location startPos = new Location("PointA");
+        Location endPos = new Location("PointB");
+
+        startPos.setLatitude(_latitude1);
+        startPos.setLongitude(_longitude1);
+        endPos.setLatitude(_latitude2);
+        endPos.setLongitude(_longitude2);
+
+        return startPos.distanceTo(endPos);
+    }
+
+}
+
+//        NaverMapApilnterface naverMapApilnterface = NaverMapRequest.getClient().create(NaverMapApilnterface.class);
 //        Call<NaverMapItem> call = naverMapApilnterface.getMapData();
 //
 //        call.enqueue(new Callback<NaverMapItem>() {
@@ -378,7 +411,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 //            }
 //        });
 
-        //         위치 권한이 허용된 경우에만 LocationTrackingMode.Follow 설정
+//         위치 권한이 허용된 경우에만 LocationTrackingMode.Follow 설정
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 //            naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
 //
@@ -389,19 +422,3 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 //        } else {
 //            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
 //        }
-
-    }
-
-    public double DistanceByDegreeAndroid(double _latitude1, double _longitude1, double _latitude2, double _longitude2) {
-        Location startPos = new Location("PointA");
-        Location endPos = new Location("PointB");
-
-        startPos.setLatitude(_latitude1);
-        startPos.setLongitude(_longitude1);
-        endPos.setLatitude(_latitude2);
-        endPos.setLongitude(_longitude2);
-
-        return startPos.distanceTo(endPos);
-    }
-
-}

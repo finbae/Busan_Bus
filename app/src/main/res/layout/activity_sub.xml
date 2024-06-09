@@ -1,20 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/bus_info_text"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bus Info will appear here"
-        android:layout_centerInParent="true"/>
+        android:background="#f0FF00">
 
-    <!-- MapView 추가 -->
-    <com.naver.maps.map.MapView
-        android:id="@+id/map_view"
+        <EditText
+            android:id="@+id/contentsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="내용"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLines="100"
+            android:padding="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="649dp"
+        android:background="#272227"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_marginTop="200dp"
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            android:tint="#f0FF00"
+            app:srcCompat="@android:drawable/ic_lock_silent_mode_off" />
+
+        <TextView
+            android:id="@+id/recordTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="음성 녹음 시작"
+            android:textColor="#FFFFFF"
+            android:textSize="30dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/bus_info_text" />
-
-</RelativeLayout>
+        android:background="#f0FF00"
+        android:orientation="vertical">
+    </LinearLayout>
+</LinearLayout>

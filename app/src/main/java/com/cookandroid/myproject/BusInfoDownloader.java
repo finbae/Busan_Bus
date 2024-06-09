@@ -29,7 +29,7 @@ public class BusInfoDownloader extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sub);
 
-        busInfoTextView = findViewById(R.id.bus_info_text);
+//        busInfoTextView = findViewById(R.id.bus_info_text);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
