@@ -60,9 +60,10 @@ public class activity_sub extends AppCompatActivity {
     RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle bundle) {
-            StartRecord();
+//            StartRecord();
             // 사용자의 음성 인식 준비가 완료되었을 때 처리할 작업
             Toast.makeText(getApplicationContext(),"음성인식 시작", Toast.LENGTH_SHORT).show();
+//            startActivity(new Intent(activity_sub.this, MainActivity.class));
         }
 
         @Override
@@ -88,40 +89,55 @@ public class activity_sub extends AppCompatActivity {
 
         @Override
         public void onError(int error) {
-            // 음성 인식 오류 발생 시 처리할 작업
+            speechRecognizer.stopListening();   //녹음 중지
+//            StopRecord();
+//            startActivity(new Intent(activity_sub.this, MainActivity.class));
+//             음성 인식 오류 발생 시 처리할 작업
             String message;
 
             switch (error) {
                 case SpeechRecognizer.ERROR_AUDIO:
                     message = "오디오 에러";
+                    speechRecognizer.stopListening();   //녹음 중지
+
                     break;
                 case SpeechRecognizer.ERROR_CLIENT:
                     message = "클라이언트 에러";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
                     message = "퍼미션 없음";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_NETWORK:
                     message = "네트워크 에러";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
                     message = "네트웍 타임아웃";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_NO_MATCH:
                     message = "찾을 수 없음";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
                     message = "RECOGNIZER 가 바쁨";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_SERVER:
                     message = "서버가 이상함";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                     message = "말하는 시간초과";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
                 default:
                     message = "알 수 없는 오류임";
+                    speechRecognizer.stopListening();   //녹음 중지
                     break;
+
             }
 
             Toast.makeText(getApplicationContext(), "에러 발생 : " + message,Toast.LENGTH_SHORT).show();
@@ -165,13 +181,13 @@ public class activity_sub extends AppCompatActivity {
     //녹음 중지
     void StopRecord() {
         recording = false;
-
         //마이크 이미지와 텍스트 변경
         recordTextView.setText("음성 녹음 시작");
 
         speechRecognizer.stopListening();   //녹음 중지
-        Toast.makeText(getApplicationContext(), "음성 기록을 중지합니다.", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(activity_sub.this, MainActivity.class));
+//        Toast.makeText(getApplicationContext(), "음성 기록을 중지합니다.", Toast.LENGTH_SHORT).show();
+//        startActivity(new Intent(activity_sub.this, MainActivity.class));
     }
 
     // 퍼미션 체크

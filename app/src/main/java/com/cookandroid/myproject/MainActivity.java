@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     private final double markerLatitude = 35.188833519106;
     private final double markerLongitude = 129.084941554332;
 
-    Call<data_model> call;
+//    Call<data_model> call;
 
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -131,27 +131,27 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         values.put("txt","HelloLlama");
         db.insert("mytable",null,values);
 
-        call = retrofit_client.getApiService().test_api_get();
-        call.enqueue(new Callback<data_model>() {
-            @Override
-            public void onResponse(Call<data_model> call, retrofit2.Response<data_model> response) {
-                data_model result = response.body();
-                String str;
-                str= result.getid() +"\n"+
-                        result.getArsno()+"\n"+
-                        result.getBstopid()+"\n"+
-                        result.getLineno()+"\n"+
-                        result.getNodenm()+"\n"+
-                        result.getGpsx()+"\n"+
-                        result.getGpsy();
-                textView.setText(str);
-            }
-
-            @Override
-            public void onFailure(Call<data_model> call, Throwable t) {
-
-            }
-        });
+//        call = retrofit_client.getApiService().test_api_get();
+//        call.enqueue(new Callback<data_model>() {
+//            @Override
+//            public void onResponse(Call<data_model> call, retrofit2.Response<data_model> response) {
+//                data_model result = response.body();
+//                String str;
+//                str= result.getid() +"\n"+
+//                        result.getArsno()+"\n"+
+//                        result.getBstopid()+"\n"+
+//                        result.getLineno()+"\n"+
+//                        result.getNodenm()+"\n"+
+//                        result.getGpsx()+"\n"+
+//                        result.getGpsy();
+//                textView.setText(str);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<data_model> call, Throwable t) {
+//
+//            }
+//        });
 
 
         NaverMapSdk.getInstance(this).setClient(
