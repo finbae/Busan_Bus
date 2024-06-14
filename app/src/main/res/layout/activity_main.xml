@@ -8,101 +8,88 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="430dp"
         android:layout_height="wrap_content"
         android:background="#f0FF00"
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="406dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="160dp"
+            android:layout_marginLeft="150dp"
             android:layout_marginRight="160dp"
-            android:text="앱이름"
+            android:text="버스위치"
             android:textSize="30dp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:text="현재 위치: "
-            android:textSize="20dp" />
-
-    </LinearLayout>
-
-    <ScrollView
+        <ScrollView
         android:fillViewport="true"
         android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="528dp"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/textView1"
-                android:backgroundTint="@color/white"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textView2"
-                android:backgroundTint="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="321dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textColor="@color/white"
+                    android:textSize="30dp" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:backgroundTint="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="316dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textColor="@color/white"
+                    android:textSize="30dp" />
 
-            <TextView
-                android:id="@+id/textView4"
-                android:backgroundTint="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="107dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textSize="30dp" />
 
-            <TextView
-                android:id="@+id/textView5"
-                android:backgroundTint="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textSize="30dp" />
 
-            <TextView
-                android:id="@+id/textView6"
-                android:backgroundTint="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:textSize="30dp"/>
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/white"
+                    android:textSize="30dp" />
+            </LinearLayout>
     </ScrollView>
-
 
     <com.naver.maps.map.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="361dp"
         android:layout_marginStart="11dp"
         android:layout_marginEnd="11dp"
         android:layout_marginBottom="16dp"

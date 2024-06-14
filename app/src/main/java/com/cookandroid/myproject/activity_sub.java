@@ -60,10 +60,9 @@ public class activity_sub extends AppCompatActivity {
     RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle bundle) {
-//            StartRecord();
+            StartRecord();
             // 사용자의 음성 인식 준비가 완료되었을 때 처리할 작업
             Toast.makeText(getApplicationContext(),"음성인식 시작", Toast.LENGTH_SHORT).show();
-//            startActivity(new Intent(activity_sub.this, MainActivity.class));
         }
 
         @Override
@@ -90,8 +89,7 @@ public class activity_sub extends AppCompatActivity {
         @Override
         public void onError(int error) {
             speechRecognizer.stopListening();   //녹음 중지
-//            StopRecord();
-//            startActivity(new Intent(activity_sub.this, MainActivity.class));
+            StopRecord();
 //             음성 인식 오류 발생 시 처리할 작업
             String message;
 
@@ -185,9 +183,8 @@ public class activity_sub extends AppCompatActivity {
         recordTextView.setText("음성 녹음 시작");
 
         speechRecognizer.stopListening();   //녹음 중지
+        Toast.makeText(getApplicationContext(), "음성 기록을 중지합니다.", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(activity_sub.this, MainActivity.class));
-//        Toast.makeText(getApplicationContext(), "음성 기록을 중지합니다.", Toast.LENGTH_SHORT).show();
-//        startActivity(new Intent(activity_sub.this, MainActivity.class));
     }
 
     // 퍼미션 체크
